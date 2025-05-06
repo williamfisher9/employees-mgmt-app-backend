@@ -9,13 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.apps</groupId>
-	<artifactId>salaryfilegenerator</artifactId>
+	<artifactId>salaries</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>salaryfilegenerator</name>
+	<name>salaries</name>
 	<description>Salary records PDF and Excel files generator</description>
 
-
-	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
