@@ -21,25 +21,25 @@ public class FormsBuilderRunner implements CommandLineRunner {
         formRepository.deleteAll();
 
         formRepository.save(new Form(1,
-                "/wps-dashboard",
-                "WPS",
-                "Use this form to create WPS compliant PDF and Excel files.",
+                "/salaries/detailed/dashboard",
+                "Detailed Form",
+                "Use this form to create a Central Bank detailed PDF and Excel salary files.",
                 "table"));
 
         formRepository.save(new Form(2,
-                "/simplified-dashboard",
-                "Corporate (Simplified)",
-                "Use this form to create a simplified version of the PDF and Excel files.",
+                "/salaries/simplified/dashboard",
+                "Simplified Form",
+                "Use this form to create a simplified version of the PDF and Excel salary files.",
                 "draft"));
 
         formRepository.save(new Form(3,
-                "/ministries-dashboard",
-                "Non-WPS (Ministries)",
-                "Use this form to create a simplified version of the PDF and Excel files.",
+                "/salaries/deductions/dashboard",
+                "Deductions Form",
+                "Use this form to create a deductions version of the PDF and Excel salary files.",
                 "domain"));
 
         formRepository.save(new Form(4,
-                "/support",
+                "/salaries/support",
                 "Support",
                 "You can use this page if you more details or assistance.",
                 "support"));

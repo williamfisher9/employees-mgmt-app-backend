@@ -39,7 +39,7 @@ public class EmployerServiceImpl implements EmployerService{
         List<Employer> employers = employerRepository.findAll();
         Employer theEmployer = null;
         for(Employer employer: employers){
-            if(employer.getFormType().equalsIgnoreCase("wps")){
+            if(employer.getFormType().equalsIgnoreCase("detailed")){
                 theEmployer=employer;
             }
         }
@@ -58,7 +58,7 @@ public class EmployerServiceImpl implements EmployerService{
         Employer theEmployer = null;
 
         for(Employer employer: employers){
-            if(employer.getFormType().equalsIgnoreCase("ministries")){
+            if(employer.getFormType().equalsIgnoreCase("deductions")){
                 theEmployer=employer;
             }
         }

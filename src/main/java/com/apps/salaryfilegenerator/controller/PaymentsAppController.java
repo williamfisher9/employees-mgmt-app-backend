@@ -63,11 +63,11 @@ public class PaymentsAppController {
     // employer
     @GetMapping("/employers/{formType}")
     public Employer getEmployerRecord(@PathVariable("formType") String formType) {
-        if(formType.equalsIgnoreCase("wps")){
+        if(formType.equalsIgnoreCase("detailed")){
             return employerService.getWpsEmployer();
         } else if(formType.equalsIgnoreCase("simplified")){
             return employerService.getSimplifiedEmployer();
-        }else if(formType.equalsIgnoreCase("ministries")){
+        }else if(formType.equalsIgnoreCase("deductions")){
             return employerService.getMinistriesEmployer();
         }else {
             return null;
@@ -84,11 +84,11 @@ public class PaymentsAppController {
     // employees
     @GetMapping("/employees/{formType}")
     public List<?> getEmployees(@PathVariable("formType") String formType) {
-        if(formType.equalsIgnoreCase("wps")){
+        if(formType.equalsIgnoreCase("detailed")){
             return wpsEmployeeService.getAll();
         } else if(formType.equalsIgnoreCase("simplified")){
             return simplifiedEmployeeService.getAll();
-        }else if(formType.equalsIgnoreCase("ministries")){
+        }else if(formType.equalsIgnoreCase("deductions")){
             return ministriesEmployeeService.getAll();
         }else {
             return null;
@@ -99,7 +99,7 @@ public class PaymentsAppController {
     @PostMapping("/employees/{formType}/addRecords/{count}")
     public ResponseEntity<?> addExtraRecords(@PathVariable("formType") String formType, @PathVariable("count") int count) {
 
-        if (formType.equalsIgnoreCase("wps")) {
+        if (formType.equalsIgnoreCase("detailed")) {
             long numberOfRecords = wpsEmployeeService.getCount();
             if(numberOfRecords%count == 0){
                 for(int i =0; i<count; i++){
@@ -121,7 +121,7 @@ public class PaymentsAppController {
                     simplifiedEmployeeService.add(new SimplifiedEmployee(null, null, defaultBankCode, BigDecimal.ZERO, ""));
                 }
             }
-        }else if(formType.equalsIgnoreCase("ministries")){
+        }else if(formType.equalsIgnoreCase("deductions")){
             long numberOfRecords = ministriesEmployeeService.getCount();
             if(numberOfRecords%50 == 0){
                 for(int i =0; i<50; i++){
@@ -143,7 +143,7 @@ public class PaymentsAppController {
     @DeleteMapping("/employees/{formType}/incomplete")
     public ResponseEntity<?> deleteIncompleteRecords(@PathVariable("formType") String formType) {
 
-        if (formType.equalsIgnoreCase("wps")) {
+        if (formType.equalsIgnoreCase("detailed")) {
             List<WpsEmployee> employees = wpsEmployeeService.findIncompleteRecords();
             if (employees.isEmpty()) {
                 return new ResponseEntity<>(new CustomResponse("204", "No records were found."),HttpStatus.OK);
@@ -171,7 +171,7 @@ public class PaymentsAppController {
                 }
                 return new ResponseEntity<>(new CustomResponse("200", "Incomplete records deleted successfully."),HttpStatus.OK);
             }
-        } else if (formType.equalsIgnoreCase("ministries")) {
+        } else if (formType.equalsIgnoreCase("deductions")) {
             List<MinistriesEmployee> employees = ministriesEmployeeService.findIncompleteRecords();
             if (employees.isEmpty()) {
                 return new ResponseEntity<>(new CustomResponse("204", "No records were found."),HttpStatus.OK);
@@ -198,9 +198,9 @@ public class PaymentsAppController {
 
         if (formType.equalsIgnoreCase("simplified")) {
             return pasteEventDataService.handleSimplifiedPasteEventObject(payloadObj);
-        } else if (formType.equalsIgnoreCase("wps")) {
+        } else if (formType.equalsIgnoreCase("detailed")) {
             return pasteEventDataService.handleWpsPasteEventObject(payloadObj);
-        } else if (formType.equalsIgnoreCase("ministries")) {
+        } else if (formType.equalsIgnoreCase("deductions")) {
             return pasteEventDataService.handleMinistriesPasteEventObject(payloadObj);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid form type!");
@@ -214,9 +214,9 @@ public class PaymentsAppController {
 
         if (formType.equalsIgnoreCase("simplified")) {
             return ministriesEmployeeService.getCount();
-        } else if (formType.equalsIgnoreCase("wps")) {
+        } else if (formType.equalsIgnoreCase("detailed")) {
             return wpsEmployeeService.getCount();
-        } else if (formType.equalsIgnoreCase("ministries")) {
+        } else if (formType.equalsIgnoreCase("deductions")) {
             return ministriesEmployeeService.getCount();
         } else {
             return 0l;
@@ -230,9 +230,9 @@ public class PaymentsAppController {
 
         if (formType.equalsIgnoreCase("simplified")) {
             return simplifiedEmployeeService.getTotalAmount();
-        } else if (formType.equalsIgnoreCase("wps")) {
+        } else if (formType.equalsIgnoreCase("detailed")) {
             return wpsEmployeeService.getTotalAmount();
-        } else if (formType.equalsIgnoreCase("ministries")) {
+        } else if (formType.equalsIgnoreCase("deductions")) {
             return ministriesEmployeeService.getTotalAmount();
         } else {
             return BigDecimal.ZERO;
@@ -249,10 +249,10 @@ public class PaymentsAppController {
         if (formType.equalsIgnoreCase("simplified")) {
             stringObjectMap.put("numberOfRecords", simplifiedEmployeeService.getCount());
             stringObjectMap.put("totalAmount", simplifiedEmployeeService.getTotalAmount());
-        } else if (formType.equalsIgnoreCase("wps")) {
+        } else if (formType.equalsIgnoreCase("detailed")) {
             stringObjectMap.put("numberOfRecords", wpsEmployeeService.getCount());
             stringObjectMap.put("totalAmount", wpsEmployeeService.getTotalAmount());
-        } else if (formType.equalsIgnoreCase("ministries")) {
+        } else if (formType.equalsIgnoreCase("deductions")) {
             stringObjectMap.put("numberOfRecords", ministriesEmployeeService.getCount());
             stringObjectMap.put("totalAmount", ministriesEmployeeService.getTotalAmount());
         }
@@ -274,24 +274,24 @@ public class PaymentsAppController {
     }
 
     // wps
-    @PutMapping("/employees/wps")
+    @PutMapping("/employees/detailed")
     public WpsEmployee addWpsEmployee(@RequestBody WpsEmployee employee) {
         return wpsEmployeeService.add(employee);
     }
 
-    @PostMapping("/employees/wps")
+    @PostMapping("/employees/detailed")
     public void addNewWpsEmployee(@RequestBody WpsEmployee employee) {
         wpsEmployeeService.add(employee);
     }
 
     // ministries
-    @PutMapping("/employees/ministries")
+    @PutMapping("/employees/deductions")
     public MinistriesEmployee addMinistriesEmployee(@RequestBody MinistriesEmployee employee) {
         //System.out.println(">>>>>>>>>>>>" + employee);
         return ministriesEmployeeService.add(employee);
     }
 
-    @PostMapping("/employees/ministries")
+    @PostMapping("/employees/deductions")
     public void addNewMinistriesEmployee(@RequestBody MinistriesEmployee employee) {
         //System.out.println(">>>>>>>>>>>>" + employee);
         ministriesEmployeeService.add(employee);
@@ -302,9 +302,9 @@ public class PaymentsAppController {
     public ResponseEntity<?> deleteAllEmployees(@PathVariable("formType") String formType) {
         if (formType.equalsIgnoreCase("simplified")) {
             simplifiedEmployeeService.deleteAll();
-        } else if (formType.equalsIgnoreCase("wps")) {
+        } else if (formType.equalsIgnoreCase("detailed")) {
             wpsEmployeeService.deleteAll();
-        } else if (formType.equalsIgnoreCase("ministries")) {
+        } else if (formType.equalsIgnoreCase("deductions")) {
             ministriesEmployeeService.deleteAll();
         } else {
             return ResponseEntity.ok().build();
@@ -320,11 +320,11 @@ public class PaymentsAppController {
             for (int id : itemsList) {
                 simplifiedEmployeeService.deleteById(id);
             }
-        } else if (formType.equalsIgnoreCase("wps")) {
+        } else if (formType.equalsIgnoreCase("detailed")) {
             for (int id : itemsList) {
                 wpsEmployeeService.deleteById(id);
             }
-        } else if (formType.equalsIgnoreCase("ministries")) {
+        } else if (formType.equalsIgnoreCase("deductions")) {
             for (int id : itemsList) {
                 ministriesEmployeeService.deleteById(id);
             }
@@ -347,7 +347,7 @@ public class PaymentsAppController {
                 System.out.println(e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Check server logs");
             }
-        } else if (formType.equalsIgnoreCase("wps")) {
+        } else if (formType.equalsIgnoreCase("detailed")) {
             try {
                 CustomResponse customResponse =  wpsPdfGenerationService.generatePdfFile();
                 return new ResponseEntity<>(customResponse, HttpStatus.OK);
@@ -364,14 +364,14 @@ public class PaymentsAppController {
     // generate excel file
     @GetMapping("/excel/{formType}")
     public ResponseEntity<?> generateExcel(@PathVariable("formType") String formType) {
-        if (formType.equalsIgnoreCase("ministries")) {
+        if (formType.equalsIgnoreCase("deductions")) {
             try {
                 CustomResponse customResponse =  ministriesExcelGenerationService.generateExcelFile();
                 return new ResponseEntity<>(customResponse, HttpStatus.OK);
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Check server logs");
             }
-        } else if (formType.equalsIgnoreCase("wps")) {
+        } else if (formType.equalsIgnoreCase("detailed")) {
             try {
                 CustomResponse customResponse =  wpsExcelGenerationService.generateExcelFile();
                 return new ResponseEntity<>(customResponse, HttpStatus.OK);

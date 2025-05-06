@@ -1,0 +1,52 @@
+name: demo pipeline
+
+on:
+  push:
+    branches: [ "master" ]
+
+
+#env:
+#  SPRING_MAIL_USERNAME: '${{ secrets.SPRING_MAIL_USERNAME }}'
+#  SPRING_MAIL_PASSWORD: '${{ secrets.SPRING_MAIL_PASSWORD }}'
+#  STRIPE_API_KEY: '${{ secrets.STRIPE_API_KEY }}'
+#  JWT_SECRET_KEY: '${{ secrets.JWT_SECRET_KEY }}'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
+      - name: Login to docker hub
+        run: docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+      - name: Build docker image
+        run: docker build -f ./Dockerfile -t willfisherapps/salaries-0.0.1 .
+      - name: Push docker image
+        run: docker push willfisherapps/salaries-0.0.1:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Check Docker Installation
+        run: |
+          if ! [ -x "$(command -v docker)" ]; then
+            echo "Error: Docker is not installed." >&2
+            exit 1
+          fi
+      - name: Pull image from docker hub
+        run: sudo docker pull willfisherapps/salaries-0.0.1:latest
+      - name: Delete existing container
+        run: |
+          if [ "$(sudo docker ps -aq -f name=salaries)" ]; then
+            sudo docker rm -f salaries
+          fi
+      - name: Run docker-compose
+        run: sudo docker-compose -f ~/docker_files/salaries/docker-compose.yaml up -d
