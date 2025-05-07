@@ -687,8 +687,9 @@ public class WpsPdfGenerationServiceImpl implements WpsPdfGenerationService {
 
         LocalDateTime date = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss");
-        String shortFilename = "payments-file-" + date.format(formatter) + ".pdf";
-        String fileName = file.getAbsoluteFile() + "\\" + shortFilename;
+
+        String shortFilename = "payments-file-" + date.format(formatter) + ".xls";
+        String fileName = file.getAbsoluteFile() + "/" + shortFilename;
 
         return Arrays.asList(shortFilename, fileName);
     }
