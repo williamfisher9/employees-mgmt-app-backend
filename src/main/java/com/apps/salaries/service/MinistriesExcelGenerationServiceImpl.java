@@ -154,7 +154,7 @@ public class MinistriesExcelGenerationServiceImpl implements MinistriesExcelGene
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss");
 
         String shortFilename = "payments-file-" + date.format(formatter) + ".xls";
-        String fileName = file.getAbsoluteFile() + "\\" + shortFilename;
+        String fileName = file.getAbsoluteFile() + "/" + shortFilename;
 
         return Arrays.asList(shortFilename, fileName);
     }

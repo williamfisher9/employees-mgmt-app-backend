@@ -725,7 +725,7 @@ public class SimplifiedPdfGenerationServiceImpl implements SimplifiedPdfGenerati
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss");
 
         String shortFilename = "payments-file-" + date.format(formatter) + ".pdf";
-        String fileName = file.getAbsoluteFile() + "\\" + shortFilename;
+        String fileName = file.getAbsoluteFile() + "/" + shortFilename;
 
         return Arrays.asList(shortFilename, fileName);
     }
