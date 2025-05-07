@@ -70,7 +70,6 @@ public class MinistriesExcelGenerationServiceImpl implements MinistriesExcelGene
     }
 
     private String createExcelFIle(Employer employer, List<MinistriesEmployee> employees)  throws IOException{
-
         //password protect the generated xls file
         Biff8EncryptionKey.setCurrentUserPassword("P@ssw0rd");
 
