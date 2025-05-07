@@ -1,6 +1,7 @@
 package com.apps.salaries.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
 @Entity
