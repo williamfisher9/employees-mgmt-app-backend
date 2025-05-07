@@ -2,7 +2,7 @@ FROM openjdk:17-jdk-alpine
 
 ARG JAR_FILE=target/*.jar
 
-RUN mkdir -p /app
+RUN mkdir -p /app/payment_files
 
 WORKDIR /app
 

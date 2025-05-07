@@ -30,13 +30,14 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class MinistriesPdfGenerationServiceImpl implements MinistriesPdfGenerationService {
+
+    @Value("${payment.files.directory}")
+    private String paymentFilesDirectory;
 
     @Autowired
     private MinistriesEmployeeService ministriesEmployeeService;
@@ -190,8 +191,8 @@ public class MinistriesPdfGenerationServiceImpl implements MinistriesPdfGenerati
     //--------------------------
 
     private String generatePdfFile(Map<byte[], List<MinistriesEmployee>> barcodeAndEmployeesMap, Employer employer) throws Exception{
-
-        String fileName = fileNameGenerator();
+        String shortFileName = fileNameGenerator().get(0);
+        String fileName = fileNameGenerator().get(1);
 
         Document document = new Document(PageSize.A4, 36,36,36,36);
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(fileName));
@@ -430,7 +431,7 @@ public class MinistriesPdfGenerationServiceImpl implements MinistriesPdfGenerati
         }
 
         document.close();
-        return fileName;
+        return shortFileName;
     }
 
     /*
@@ -662,16 +663,20 @@ public class MinistriesPdfGenerationServiceImpl implements MinistriesPdfGenerati
         return employeesTable;
     }
 
-    private String fileNameGenerator() {
+    private List<String> fileNameGenerator() {
 
-        File file = new File("payment-files");
+        File file = new File(paymentFilesDirectory);
         file.mkdirs();
 
         LocalDateTime date = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss");
-        String fileName = file.getAbsoluteFile() + "\\payments-file-" + date.format(formatter) + ".pdf";
 
-        return fileName;
+
+        String shortFilename = "payments-file-" + date.format(formatter) + ".pdf";
+        String fileName = file.getAbsoluteFile() + "\\" + shortFilename;
+
+        return Arrays.asList(shortFilename, fileName);
+
     }
 
     private StringBuilder prepareEmployeesList(List<MinistriesEmployee> employeesList, int pageNumber) {

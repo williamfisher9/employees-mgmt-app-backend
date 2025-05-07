@@ -8,6 +8,7 @@ import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -16,10 +17,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class MinistriesExcelGenerationServiceImpl implements MinistriesExcelGenerationService {
+
+    @Value("${payment.files.directory}")
+    private String paymentFilesDirectory;
 
     @Autowired
     private EmployerService employerService;
@@ -124,7 +129,8 @@ public class MinistriesExcelGenerationServiceImpl implements MinistriesExcelGene
         }
 
         // Write the output to a file
-        String fileName = fileNameGenerator();
+        String shortFileName = fileNameGenerator().get(0);
+        String fileName = fileNameGenerator().get(1);
         FileOutputStream fileOut = new FileOutputStream(fileName);
         workbook.write(fileOut);
         fileOut.close();
@@ -135,20 +141,22 @@ public class MinistriesExcelGenerationServiceImpl implements MinistriesExcelGene
         //password protect the generated xls file
         Biff8EncryptionKey.setCurrentUserPassword(null);
 
-        return fileName;
+        return shortFileName;
 
     }
 
-    private String fileNameGenerator() {
+    private List<String> fileNameGenerator() {
 
-        File file = new File("payment-files");
+        File file = new File(paymentFilesDirectory);
         file.mkdirs();
 
         LocalDateTime date = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss");
-        String fileName = file.getAbsoluteFile() + "\\payments-file-" + date.format(formatter) + ".xls";
 
-        return fileName;
+        String shortFilename = "payments-file-" + date.format(formatter) + ".xls";
+        String fileName = file.getAbsoluteFile() + "\\" + shortFilename;
+
+        return Arrays.asList(shortFilename, fileName);
     }
 
 }

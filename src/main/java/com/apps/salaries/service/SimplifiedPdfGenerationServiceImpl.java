@@ -36,6 +36,10 @@ import java.util.List;
 @Service
 public class SimplifiedPdfGenerationServiceImpl implements SimplifiedPdfGenerationService {
 
+
+    @Value("${payment.files.directory}")
+    private String paymentFilesDirectory;
+
     @Autowired
     private SimplifiedEmployeeService simplifiedEmployeeService;
 
@@ -64,9 +68,6 @@ public class SimplifiedPdfGenerationServiceImpl implements SimplifiedPdfGenerati
             "C6\tD6\tA7\tB7\tC7\tD7\tA8\tB8\tC8\tD8\tA9\tB9\tC9\tD9\tA10\tB10\tC10\tD10\tA11\tB11\tC11\tD11\tA12\tB12\tC12\tD12\tA13\tB13\tC13\tD13\tA14\tB14\tC14\t" +
             "D14\tA15\tB15\tC15\tD15\tHV1\tV\tNOP\tTVM\thashValueP1\t\n";
 
-    //private static final String OTHER_PAGES_HEADER_VALUE = "ZCN1[1]\tZDA1[1]\tG1\tH1\tI1\tJ1\tG2\tH2\tI2\tJ2\tG3\tH3\tI3\tJ3\tG4\tH4\tI4\tJ4\tG5\tH5\tI5\tJ5\tG6\tH6\t" +
-      //      "I6\tJ6\tG7\tH7\tI7\tJ7\tG8\tH8\tI8\tJ8\tG9\tH9\tI9\tJ9\tG10\tH10\tI10\tJ10\tG11\tH11\tI11\tJ11\tG12\tH12\tI12\tJ12\tG13\tH13\tI13\tJ13\tG14\tH14\tI14\tJ14\t" +
-        //    "G15\tH15\tI15\tJ15\tG16\tH16\tI16\tJ16\tHV2\tV[1]\tNOP2\thashValueP2\t\n";
 
     @Value("${default.bank.account.number.length}")
     private String defaultBankAccountNumberLength;
@@ -136,6 +137,7 @@ public class SimplifiedPdfGenerationServiceImpl implements SimplifiedPdfGenerati
 
         // generate image pdf
         String generatedFileName = generatePdfFile(barcodeAndEmployeesMap, employer);
+
         return new CustomResponse("200", generatedFileName);
     }
 
@@ -224,7 +226,8 @@ public class SimplifiedPdfGenerationServiceImpl implements SimplifiedPdfGenerati
     //--------------------------
 
     private String generatePdfFile(Map<byte[], List<SimplifiedEmployee>> barcodeAndEmployeesMap, Employer employer) throws Exception{
-        String fileName = fileNameGenerator();
+        String shortFileName = fileNameGenerator().get(0);
+        String fileName = fileNameGenerator().get(1);
 
         Document document = new Document(PageSize.A4, 36,36,36,36);
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(fileName));
@@ -492,58 +495,10 @@ public class SimplifiedPdfGenerationServiceImpl implements SimplifiedPdfGenerati
 
         document.close();
 
-
-        return fileName;
+        return shortFileName;
     }
 
-    /*
-    private PdfPTable addExtraDetailsTable(Font fontPageHeader, DeliveryPerson deliveryPerson) {
 
-        PdfPTable extraDetailsTable = new PdfPTable(6);
-        extraDetailsTable.setWidthPercentage(100);
-        extraDetailsTable.setSpacingBefore(0f);
-        extraDetailsTable.setSpacingAfter(0f);
-
-        PdfPCell deliveryPersonNameLabelCell = new PdfPCell(new Paragraph("Delivery Person Name:" ,fontPageHeader));
-        deliveryPersonNameLabelCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        //deliveryPersonCell.setBackgroundColor(tableColor);
-        deliveryPersonNameLabelCell.setBorder(Rectangle.NO_BORDER);
-        deliveryPersonNameLabelCell.setColspan(1);
-        deliveryPersonNameLabelCell.setFixedHeight(15f);
-
-        PdfPCell deliveryPersonNameCell = new PdfPCell(new Paragraph(deliveryPerson.getDeliveryPersonName(),fontPageHeader));
-        deliveryPersonNameCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        //deliveryPersonCell.setBackgroundColor(tableColor);
-        deliveryPersonNameCell.setBorder(Rectangle.NO_BORDER);
-        deliveryPersonNameCell.setColspan(5);
-        deliveryPersonNameCell.setFixedHeight(15f);
-
-        extraDetailsTable.addCell(deliveryPersonNameLabelCell);
-        extraDetailsTable.addCell(deliveryPersonNameCell);
-
-
-        PdfPCell deliveryPersonIdLabelCell = new PdfPCell(new Paragraph("Delivery Person ID:" ,fontPageHeader));
-        deliveryPersonIdLabelCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        //deliveryPersonCell.setBackgroundColor(tableColor);
-        deliveryPersonIdLabelCell.setBorder(Rectangle.NO_BORDER);
-        deliveryPersonIdLabelCell.setColspan(1);
-        deliveryPersonIdLabelCell.setFixedHeight(15f);
-
-        PdfPCell deliveryPersonIdCell = new PdfPCell(new Paragraph(deliveryPerson.getDeliveryPersonId(),fontPageHeader));
-        deliveryPersonIdCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        //deliveryPersonCell.setBackgroundColor(tableColor);
-        deliveryPersonIdCell.setBorder(Rectangle.NO_BORDER);
-        deliveryPersonIdCell.setColspan(5);
-        deliveryPersonIdCell.setFixedHeight(15f);
-
-        extraDetailsTable.addCell(deliveryPersonIdLabelCell);
-        extraDetailsTable.addCell(deliveryPersonIdCell);
-
-        return extraDetailsTable;
-
-    }
-
-     */
 
     private PdfPTable addEmployeesTable(Font fontPageHeader, List<SimplifiedEmployee> employeeList, int documentPageNumber) throws DocumentException {
         PdfPTable employeesTable = new PdfPTable(5);
@@ -761,16 +716,18 @@ public class SimplifiedPdfGenerationServiceImpl implements SimplifiedPdfGenerati
         return employeesTable;
     }
 
-    private String fileNameGenerator() {
+    private List<String> fileNameGenerator() {
 
-        File file = new File("payment-files");
+        File file = new File(paymentFilesDirectory);
         file.mkdirs();
 
         LocalDateTime date = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss");
-        String fileName = file.getAbsoluteFile() + "\\payments-file-" + date.format(formatter) + ".pdf";
 
-        return fileName;
+        String shortFilename = "payments-file-" + date.format(formatter) + ".pdf";
+        String fileName = file.getAbsoluteFile() + "\\" + shortFilename;
+
+        return Arrays.asList(shortFilename, fileName);
     }
 
     private StringBuilder prepareEmployeesListForPageOne(List<SimplifiedEmployee> employeesList, int pageNumber) {
@@ -1048,65 +1005,6 @@ public class SimplifiedPdfGenerationServiceImpl implements SimplifiedPdfGenerati
         return debitStatementTable;
     }
 
-    /*
-    private PdfPTable addDeliveryPersonTable(Font fontPageHeader, DeliveryPerson deliveryPerson) {
-        PdfPTable deliveryTable = new PdfPTable(6);
-        deliveryTable.setWidthPercentage(100);
-        deliveryTable.setSpacingBefore(0f);
-        deliveryTable.setSpacingAfter(0f);
-
-        //email address field
-        Phrase deliveryPersonNameLabelPhrase = new Phrase("Delivery Person Name: ",  fontPageHeader);
-        PdfPCell deliveryPersonNameLabelCell = new PdfPCell(deliveryPersonNameLabelPhrase);
-        deliveryPersonNameLabelCell.setBorder(Rectangle.NO_BORDER);
-        deliveryPersonNameLabelCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        deliveryPersonNameLabelCell.setColspan(1);
-        deliveryPersonNameLabelCell.setFixedHeight(20f);
-
-        Chunk deliveryPersonNameChunk = new Chunk(deliveryPerson.getDeliveryPersonName(),  fontPageHeader);
-        deliveryPersonNameChunk.setUnderline(0.5f, -1.5f);
-        Phrase deliveryPersonPhrase = new Phrase(deliveryPersonNameChunk);
-        PdfPCell deliveryPersonCell = new PdfPCell(deliveryPersonPhrase);
-        deliveryPersonCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        //deliveryPersonCell.setBackgroundColor(tableColor);
-        deliveryPersonCell.setBorder(Rectangle.NO_BORDER);
-        deliveryPersonCell.setColspan(2);
-        deliveryPersonCell.setFixedHeight(20f);
-
-        deliveryTable.addCell(deliveryPersonNameLabelCell);
-        deliveryTable.addCell(deliveryPersonCell);
-
-        //empty cell
-        //PdfPCell emptyCell = new PdfPCell(new Phrase(""));
-        //emptyCell.setColspan(1);
-        //emptyCell.setFixedHeight(20f);
-        //emptyCell.setBorder(Rectangle.NO_BORDER);
-        //deliveryTable.addCell(emptyCell);
-
-        //phone number field
-        Phrase deliveryPersonIdLabelPhrase = new Phrase("Delivery Person ID: ",  fontPageHeader);
-        PdfPCell deliveryPersonIdLabelCell = new PdfPCell(deliveryPersonIdLabelPhrase);
-        deliveryPersonIdLabelCell.setBorder(Rectangle.NO_BORDER);
-        deliveryPersonIdLabelCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        deliveryPersonIdLabelCell.setColspan(1);
-        deliveryPersonIdLabelCell.setFixedHeight(20f);
-
-        Chunk deliveryPersonIdChunk = new Chunk(deliveryPerson.getDeliveryPersonId(),  fontPageHeader);
-        deliveryPersonIdChunk.setUnderline(0.5f, -1.5f);
-        Phrase deliveryPersonIdPhrase = new Phrase(deliveryPersonIdChunk);
-        PdfPCell deliveryPersonIdCell = new PdfPCell(deliveryPersonIdPhrase);
-        deliveryPersonIdCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        //deliveryPersonIdCell.setBackgroundColor(tableColor);
-        deliveryPersonIdCell.setColspan(2);
-        deliveryPersonIdCell.setFixedHeight(20f);
-        deliveryPersonIdCell.setBorder(Rectangle.NO_BORDER);
-
-        deliveryTable.addCell(deliveryPersonIdLabelCell);
-        deliveryTable.addCell(deliveryPersonIdCell);
-
-        return deliveryTable;
-    }
-*/
     private String calculateHashValue(String input){
 
         input = input.concat("^");

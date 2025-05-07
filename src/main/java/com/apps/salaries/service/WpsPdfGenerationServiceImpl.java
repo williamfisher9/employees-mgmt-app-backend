@@ -40,6 +40,9 @@ import java.util.List;
 @Service
 public class WpsPdfGenerationServiceImpl implements WpsPdfGenerationService {
 
+    @Value("${payment.files.directory}")
+    private String paymentFilesDirectory;
+
     @Autowired
     private WpsEmployeeService wpsEmployeeService;
 
@@ -201,7 +204,8 @@ public class WpsPdfGenerationServiceImpl implements WpsPdfGenerationService {
 
     private String generatePdfFile(Map<byte[], List<WpsEmployee>> barcodeAndEmployeesMap, Employer employer) throws Exception{
 
-        String fileName = fileNameGenerator();
+        String shortFileName = fileNameGenerator().get(0);
+        String fileName = fileNameGenerator().get(1);
 
         Document document = new Document(PageSize.A4, 36,36,36,36);
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(fileName));
@@ -460,7 +464,7 @@ public class WpsPdfGenerationServiceImpl implements WpsPdfGenerationService {
         }
 
         document.close();
-        return fileName;
+        return shortFileName;
     }
 
     /*private PdfPTable addExtraDetailsTable(Font fontPageHeader, DeliveryPerson deliveryPerson) {
@@ -676,16 +680,17 @@ public class WpsPdfGenerationServiceImpl implements WpsPdfGenerationService {
         return employeesTable;
     }
 
-    private String fileNameGenerator() {
+    private List<String> fileNameGenerator() {
 
-        File file = new File("payment-files");
+        File file = new File(paymentFilesDirectory);
         file.mkdirs();
 
         LocalDateTime date = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss");
-        String fileName = file.getAbsoluteFile() + "\\payments-file-" + date.format(formatter) + ".pdf";
+        String shortFilename = "payments-file-" + date.format(formatter) + ".pdf";
+        String fileName = file.getAbsoluteFile() + "\\" + shortFilename;
 
-        return fileName;
+        return Arrays.asList(shortFilename, fileName);
     }
 
     private StringBuilder prepareEmployeesList(List<WpsEmployee> employeesList, int pageNumber) {

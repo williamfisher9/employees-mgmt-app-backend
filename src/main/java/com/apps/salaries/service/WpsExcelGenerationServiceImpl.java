@@ -15,10 +15,14 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class WpsExcelGenerationServiceImpl implements WpsExcelGenerationService {
+
+    @Value("${payment.files.directory}")
+    private String paymentFilesDirectory;
 
     @Value("${default.bank.shortName}")
     private String defaultBankShortName;
@@ -177,7 +181,8 @@ public class WpsExcelGenerationServiceImpl implements WpsExcelGenerationService 
         }
 
         // Write the output to a file
-        String fileName = fileNameGenerator();
+        String shortFileName = fileNameGenerator().get(0);
+        String fileName = fileNameGenerator().get(1);
         FileOutputStream fileOut = new FileOutputStream(fileName);
 
         workbook.write(fileOut);
@@ -211,19 +216,21 @@ public class WpsExcelGenerationServiceImpl implements WpsExcelGenerationService 
         //password protect the generated xls file
         Biff8EncryptionKey.setCurrentUserPassword(null);
 
-        return fileName;
+        return shortFileName;
 
     }
 
-    private String fileNameGenerator() {
-        File file = new File("payment-files");
+    private List<String> fileNameGenerator() {
+        File file = new File(paymentFilesDirectory);
         file.mkdirs();
 
         LocalDateTime date = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss");
-        String fileName = file.getAbsoluteFile() + "\\payments-file-" + date.format(formatter) + ".xls";
 
-        return fileName;
+        String shortFilename = "payments-file-" + date.format(formatter) + ".xls";
+        String fileName = file.getAbsoluteFile() + "\\" + shortFilename;
+
+        return Arrays.asList(shortFilename, fileName);
     }
 
 }
