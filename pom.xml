@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.apps</groupId>
 	<artifactId>salaries</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>salaries</name>
 	<description>Salary records PDF and Excel files generator</description>
 

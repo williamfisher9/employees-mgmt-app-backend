@@ -4,13 +4,6 @@ on:
   push:
     branches: [ "master" ]
 
-
-#env:
-#  SPRING_MAIL_USERNAME: '${{ secrets.SPRING_MAIL_USERNAME }}'
-#  SPRING_MAIL_PASSWORD: '${{ secrets.SPRING_MAIL_PASSWORD }}'
-#  STRIPE_API_KEY: '${{ secrets.STRIPE_API_KEY }}'
-#  JWT_SECRET_KEY: '${{ secrets.JWT_SECRET_KEY }}'
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,9 +20,9 @@ jobs:
       - name: Login to docker hub
         run: docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
       - name: Build docker image
-        run: docker build -f ./Dockerfile -t willfisherapps/salaries-0.0.1 .
+        run: docker build -f ./Dockerfile -t willfisherapps/salaries-0.0.2 .
       - name: Push docker image
-        run: docker push willfisherapps/salaries-0.0.1:latest
+        run: docker push willfisherapps/salaries-0.0.2:latest
 
   deploy:
     needs: build
@@ -42,7 +35,7 @@ jobs:
             exit 1
           fi
       - name: Pull image from docker hub
-        run: sudo docker pull willfisherapps/salaries-0.0.1:latest
+        run: sudo docker pull willfisherapps/salaries-0.0.2:latest
       - name: Delete existing container
         run: |
           if [ "$(sudo docker ps -aq -f name=salaries)" ]; then
