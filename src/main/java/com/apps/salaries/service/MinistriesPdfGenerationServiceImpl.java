@@ -673,7 +673,7 @@ public class MinistriesPdfGenerationServiceImpl implements MinistriesPdfGenerati
 
 
         String shortFilename = "payments-file-" + date.format(formatter) + ".pdf";
-        String fileName = file.getAbsoluteFile() + "\\" + shortFilename;
+        String fileName = file.getAbsoluteFile() + "/" + shortFilename;
 
         return Arrays.asList(shortFilename, fileName);
 
