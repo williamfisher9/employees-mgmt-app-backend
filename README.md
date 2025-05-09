@@ -30,8 +30,8 @@ The backend powers a platform designed to:
 
 1. **Clone the Repository**
 ```bash
-git clone https://github.com/yourusername/salary-files-generator-backend.git
-cd salary-files-generator-backend
+git clone https://github.com/williamfisher9/employees-mgmt-app-backend
+cd employees-mgmt-app-backend
 ```
 
 2. **Build and Run**
