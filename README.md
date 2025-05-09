@@ -30,7 +30,7 @@ The backend powers a platform designed to:
 
 1. **Clone the Repository**
 ```bash
-git clone https://github.com/williamfisher9/employees-mgmt-app-backend
+git clone https://github.com/williamfisher9/salaries-mgmt-app-backend
 cd employees-mgmt-app-backend
 ```
 
