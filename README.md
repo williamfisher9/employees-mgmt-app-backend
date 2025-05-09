@@ -60,3 +60,7 @@ H2 Database UI: http://localhost:8080/h2-console
 - RESTful API architecture
 - Lightweight embedded database (H2)
 - Modular and extensible architecture
+
+
+## 🌐 Live Demo
+[Link to Live Demo](https://willtechbooth.dev/salaries/)
